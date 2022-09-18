@@ -1,0 +1,20 @@
+{
+	"name": "three-lightmap-baker",
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"start": "vite --mode dev --host",
+		"build": "vite build"
+	},
+	"dependencies": {
+		"@tweakpane/core": "^1.0.3",
+		"three": "^0.129.0",
+		"three-mesh-bvh": "^0.5.16",
+		"tweakpane": "^3.0.2",
+		"xatlas-three": "^0.1.1"
+	},
+	"devDependencies": {
+		"typescript": "^4.4.4",
+		"vite": "^2.6.13"
+	}
+}
