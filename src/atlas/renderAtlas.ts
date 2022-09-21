@@ -102,7 +102,7 @@ const offsets =
 
 export const renderAtlas = (renderer: WebGLRenderer, meshs: Mesh[], resolution: number, dialate: boolean = true) => {
 
-    const renderWithShader = (material: ShaderMaterial): [ WebGLRenderTarget, Float32Array ] => {
+    const renderWithShader = (material: ShaderMaterial): WebGLRenderTarget => {
         const target = new WebGLRenderTarget(resolution, resolution, {type: FloatType, magFilter: NearestFilter, minFilter: NearestFilter});
 
         // Create orthographic camera with large clip area to prevent clipping the geometry
@@ -139,16 +139,14 @@ export const renderAtlas = (renderer: WebGLRenderer, meshs: Mesh[], resolution: 
 
         renderer.setRenderTarget(null);
         
-        return [ target, null ];
+        return target;
     }
 
-    const [ positionTexture, worldPositions ] = renderWithShader(worldPositionMaterial);
-    const [ normalTexture, normalPositions ] = renderWithShader(normalMaterial);
+    const positionTexture = renderWithShader(worldPositionMaterial);
+    const normalTexture = renderWithShader(normalMaterial);
 
     return {
         positionTexture,
-        positions: worldPositions,
         normalTexture,
-        normals: normalPositions
     };
 };

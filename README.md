@@ -7,6 +7,10 @@
 
 
 ## Todo
+ - Progressive renderer
+ - Convert to an API
+ - NPM Package
+ - Add denoiser options
  - High casts can cause the WebGL context to timeout
  - Import & Export models & lightmaps
  - Bounce lighting

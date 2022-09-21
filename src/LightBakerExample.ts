@@ -1,10 +1,12 @@
 import { sRGBEncoding, Color, DirectionalLight, DoubleSide, LinearFilter, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, PerspectiveCamera, PlaneGeometry, Scene, Texture, Vector3, WebGLRenderer, WebGLRenderTarget } from 'three';
+import { MeshBVH } from 'three-mesh-bvh';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { Pane } from 'tweakpane';
 import { generateAtlas } from './atlas/generateAtlas';
 import { renderAtlas } from './atlas/renderAtlas';
-import { generateLightmap, RaycastOptions } from './raycast/raycaster';
+import { generateLightmapper as generateLightmapper, Lightmapper, RaycastOptions } from './lightmap/Lightmapper';
+import { mergeGeometry } from './utils/GeometryUtils';
 import { LoadGLTF } from './utils/LoaderUtils';
 
 const models = {
@@ -42,30 +44,28 @@ export class LightBakerExample {
     uvDebugTexture: Texture;
     positionTexture: WebGLRenderTarget;
     normalTexture: WebGLRenderTarget;
-    lightmapTexture: Texture;
+    lightmapTexture: WebGLRenderTarget;
 
     debugPosition: Mesh;
     debugNormals: Mesh;
     debugLightmap: Mesh;
 
+    lightmapper: Lightmapper | null;
+
+    pane: Pane;
+
     options = {
         model: "level_blockout",
         renderMode: "beauty",
         lightMapSize: 1024,
-        casts: 40,
+        casts: 1,
         filterMode: "linear",
-        denoise: true,
-        samples: 1,
-        denoiseOptions: {
-            sigma: 2.5,
-            threshold: 0.2,
-            kSigma: 1.0,
-        },
         directLightEnabled: true,
         indirectLightEnabled: true,
         ambientLightEnabled: true,
         ambientDistance: 0.3,
         debugTextures: false,
+        pause: false,
     };
 
     constructor(uvDebugTexture: Texture) {
@@ -100,89 +100,59 @@ export class LightBakerExample {
         this.scene.add(this.lightDummy);
         this.scene.add(this.lightTranformController);
 
-        const pane = new Pane();
-        pane.addInput(this.options, 'model', {
+        this.pane = new Pane();
+        this.pane.addInput(this.options, 'model', {
             options: models
         }).on('change', () => this.onMapChange());
-        pane.addInput(this.options, 'renderMode', {
+        this.pane.addInput(this.options, 'renderMode', {
             options: renderMode
         }).on('change', () => this.onRenderModeChange());
 
-        pane.addInput(this.options, 'lightMapSize', {
-            max: 8192,
+        this.pane.addInput(this.options, 'lightMapSize', {
+            max: 4096,
             min: 128,
             step: 128
-        });
+        })
 
-        pane.addInput(this.options, 'casts', {
-            max: 500,
+        this.pane.addInput(this.options, 'casts', {
+            max: 4,
             min: 1
         });
 
-        pane.addInput(this.options, 'samples', {
-            max: 10,
-            min: 1,
-            step: 1,
-        });
-
-        pane.addInput(this.options, 'directLightEnabled');
-        pane.addInput(this.options, 'indirectLightEnabled');
-        pane.addInput(this.options, 'ambientLightEnabled');
-        pane.addInput(this.options, 'ambientDistance', {
+        this.pane.addInput(this.options, 'directLightEnabled');
+        this.pane.addInput(this.options, 'indirectLightEnabled');
+        this.pane.addInput(this.options, 'ambientLightEnabled');
+        this.pane.addInput(this.options, 'ambientDistance', {
             max: 2,
             min: 0.01
         });
 
-        pane.addInput(this.options, 'debugTextures').on('change', () => this.onRenderModeChange());
-        
+        this.pane.addInput(this.options, 'debugTextures').on('change', () => this.onRenderModeChange());
 
-        pane.addInput(this.options, 'denoise').on('change', () => {
-            denoiseOptions.disabled = !this.options.denoise;
-        });
-
-        pane.addInput(this.options, 'filterMode', {
+        this.pane.addInput(this.options, 'filterMode', {
             options: Filter
         }).on('change', () => this.onRenderModeChange());
-
         
-        const denoiseOptions = pane.addFolder({
-            title: 'Denoise Options',
-            expanded: false
+        this.pane.addButton({
+            title: 'Reset'
+        }).on('click', () => {
+            this.generateLightmap();
+            
+            // Todo: Not sure why need this in a timeout...
+            setTimeout(() => {
+                this.lightmapper.render();
+            }, 0);
         });
 
-        denoiseOptions.addInput(this.options.denoiseOptions, 'sigma', {
-            max: 5,
-            min: 0.1,
-            step: 0.1
-        });
-
-        denoiseOptions.addInput(this.options.denoiseOptions, 'kSigma', {
-            max: 5,
-            min: 0.1,
-            step: 0.1
-        });
-
-        denoiseOptions.addInput(this.options.denoiseOptions, 'threshold', {
-            max: 5,
-            min: 0.1,
-            step: 0.1
-        });
-
-        
-        pane.addButton({
-            title: 'Render'
-        }).on('click', () => this.generateLightmap());
-
+        this.pane.addInput(this.options, 'pause');
         
         this.initialSetup();
     }
 
     updateSize() {
-
-        this.renderer.setSize( window.innerWidth, window.innerHeight );
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
-
     }
 
     async initialSetup() {
@@ -197,6 +167,8 @@ export class LightBakerExample {
         this.camera.position.set( 0, 10, 10 );
 
         this.currentModelMeshs = [];
+
+        this.lightmapper = null;
         
         const gltf = await LoadGLTF(this.options.model);
 
@@ -215,6 +187,9 @@ export class LightBakerExample {
         this.update();
 
         await this.generateLightmap();
+
+        // Render once to get the lightmap
+        this.lightmapper.render();
     }
 
     async updateAtlasTextures() {
@@ -230,29 +205,31 @@ export class LightBakerExample {
 
         this.update();
 
+        const mergedGeomerty = mergeGeometry(this.currentModelMeshs);
+        const bvh = new MeshBVH(mergedGeomerty);
+     
         const lightmapperOptions: RaycastOptions = {
             resolution: resolution,
             casts: this.options.casts,
-            samples: this.options.samples,
             filterMode: this.options.filterMode == "linear" ? LinearFilter : NearestFilter,
-            denoise: this.options.denoise ? this.options.denoiseOptions : false,
             lightPosition: this.lightDummy.position,
             lightSize: 3,
             ambientDistance: this.options.ambientDistance,
             ambientLightEnabled: this.options.ambientLightEnabled,
             directLightEnabled: this.options.directLightEnabled,
-            indirectLightEnabled: this.options.indirectLightEnabled,
-            
+            indirectLightEnabled: this.options.indirectLightEnabled,   
         }
 
-        this.lightTranformController.visible = false;
-
-        const lightmapTexture = await generateLightmap(this.renderer, atlas.positionTexture.texture, atlas.normalTexture.texture, this.currentModelMeshs, lightmapperOptions);
-        this.lightmapTexture = lightmapTexture;
-
-        this.lightTranformController.visible = true;
+        this.lightmapper = await generateLightmapper(this.renderer, atlas.positionTexture.texture, atlas.normalTexture.texture, bvh, lightmapperOptions);
+        this.lightmapTexture = this.lightmapper.renderTexture;
 
         this.onRenderModeChange();
+
+        // Auto-pause
+        setTimeout(() => {
+            this.options.pause = true;
+            this.pane.refresh();
+        }, 2000);
     }
 
     createDebugTexture(texture: Texture, position: Vector3) {
@@ -338,10 +315,8 @@ export class LightBakerExample {
 
         if(this.options.renderMode == "standard") {
             this.scene.add(this.directionalLight);
-            console.log("add light")
         } else {
             this.scene.remove(this.directionalLight);
-            console.log("remove light")
         }
 
         this.onDebugTexturesChange();
@@ -349,6 +324,10 @@ export class LightBakerExample {
 
     update() {
         requestAnimationFrame(() => this.update());
+
+        if(this.lightmapper && !this.options.pause) {
+            this.lightmapper.render();
+        }
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
