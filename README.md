@@ -50,3 +50,6 @@
  - [High level overview of a lightmapping generation process](https://www.reddit.com/r/GraphicsProgramming/comments/brl22k/high_level_overview_of_a_lightmapping_generation/)
  - [Baking artifact-free lightmaps on the GPU](https://ndotl.wordpress.com/2018/08/29/baking-artifact-free-lightmaps/)
  - [Radiosity Baker](http://david-westreicher.github.io/2014/05/31/radiosity/)
+ 
+ ## Credit
+  - [Level Blockout Model - DJMaesen](https://sketchfab.com/3d-models/level-blockout-24b39d9beef54166a14e6f2542d01def)
