@@ -177,6 +177,14 @@ export class LightBakerExample {
         this.initialSetup();
     }
 
+    updateSize() {
+
+        this.renderer.setSize( window.innerWidth, window.innerHeight );
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+
+    }
+
     async initialSetup() {
         await this.onMapChange();
     }

@@ -7,5 +7,8 @@ import { loadXAtlasThree } from './atlas/generateAtlas';
     await loadXAtlasThree();
     const uvDebugTexture = await LoadTexture("uv_map.jpg");
     
-    new LightBakerExample(uvDebugTexture);
+    const app = new LightBakerExample(uvDebugTexture);
+    window.addEventListener('resize', () => {
+        app.updateSize();
+    });
 })();
