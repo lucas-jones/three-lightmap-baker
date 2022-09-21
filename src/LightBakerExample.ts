@@ -1,4 +1,4 @@
-import { BoxGeometry, Color, DirectionalLight, DoubleSide, LinearFilter, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, PerspectiveCamera, PlaneGeometry, Scene, Texture, Vector3, WebGLRenderer, WebGLRenderTarget } from 'three';
+import { sRGBEncoding, Color, DirectionalLight, DoubleSide, LinearFilter, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, PerspectiveCamera, PlaneGeometry, Scene, Texture, Vector3, WebGLRenderer, WebGLRenderTarget } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { Pane } from 'tweakpane';
@@ -16,7 +16,8 @@ const renderMode = {
     "Positions": "positions",
     "Normals": "normals",
     "UV2 Debug": "uv",
-    "Lightmap": "lightmap"
+    "Lightmap": "lightmap",
+    "Beauty": "beauty"
 }
 
 const Filter = {
@@ -49,7 +50,7 @@ export class LightBakerExample {
 
     options = {
         model: "level_blockout",
-        renderMode: "lightmap",
+        renderMode: "beauty",
         lightMapSize: 1024,
         casts: 40,
         filterMode: "linear",
@@ -79,6 +80,7 @@ export class LightBakerExample {
         this.renderer = new WebGLRenderer({
             antialias: true,
         });
+        this.renderer.outputEncoding = sRGBEncoding;
         this.renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild(this.renderer.domElement);
 
@@ -175,6 +177,14 @@ export class LightBakerExample {
         this.initialSetup();
     }
 
+    updateSize() {
+
+        this.renderer.setSize( window.innerWidth, window.innerHeight );
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+
+    }
+
     async initialSetup() {
         await this.onMapChange();
     }
@@ -192,7 +202,7 @@ export class LightBakerExample {
 
         gltf.scene.traverse((child: any) => {
             if(child.isMesh) {
-                child.material = new MeshStandardMaterial({color: 0xffffff });
+                child.material._originalMap = child.material.map;
                 this.currentModelMeshs.push(child);
             }
         });
@@ -287,9 +297,11 @@ export class LightBakerExample {
         this.currentModel.traverse((child: any) => {
             if(child.isMesh) {
                 // child.material = new MeshBasicMaterial();
+                child.material.map = null;
 
                 if(this.options.renderMode == "standard") {
                     child.material.lightMap = null;
+                    child.material.map = child.material._originalMap;
                 }
 
                 if(this.options.renderMode == "positions") {
@@ -306,6 +318,11 @@ export class LightBakerExample {
 
                 if(this.options.renderMode == "lightmap") {
                     child.material.lightMap = this.lightmapTexture; 
+                }
+
+                if(this.options.renderMode == "beauty") {
+                    child.material.lightMap = this.lightmapTexture; 
+                    child.material.map = child.material._originalMap;
                 }
 
                 if(child.material.lightMap) {
