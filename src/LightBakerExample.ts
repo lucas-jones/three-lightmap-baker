@@ -116,7 +116,8 @@ export class LightBakerExample {
 
         this.pane.addInput(this.options, 'casts', {
             max: 4,
-            min: 1
+            min: 1,
+            step: 1,
         });
 
         this.pane.addInput(this.options, 'directLightEnabled');
@@ -136,6 +137,9 @@ export class LightBakerExample {
         this.pane.addButton({
             title: 'Reset'
         }).on('click', () => {
+            this.options.pause = false;
+            this.pane.refresh();
+
             this.generateLightmap();
             
             // Todo: Not sure why need this in a timeout...

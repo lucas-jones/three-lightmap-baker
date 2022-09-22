@@ -1,4 +1,4 @@
-import { FloatType, Matrix4, Mesh, OrthographicCamera, PlaneGeometry, Texture, TextureFilter, Vector3, WebGLRenderer, WebGLRenderTarget } from "three";
+import { LinearFilter, LinearMipMapLinearFilter, FloatType, Matrix4, Mesh, OrthographicCamera, PlaneGeometry, Texture, TextureFilter, Vector3, WebGLRenderer, WebGLRenderTarget } from "three";
 import { MeshBVH, MeshBVHOptions } from 'three-mesh-bvh';
 import { LightmapperMaterial } from "./LightmapperMaterial";
 
@@ -38,7 +38,12 @@ export const generateLightmapper = (renderer: WebGLRenderer, positions: Texture,
 		ambientDistance: options.ambientDistance,
 	});
 
-	const renderTexture = new WebGLRenderTarget(options.resolution, options.resolution, { type: FloatType, magFilter: options.filterMode, minFilter: options.filterMode });
+	const renderTexture = new WebGLRenderTarget(options.resolution, options.resolution, {
+		type: FloatType,
+		minFilter: LinearMipMapLinearFilter,
+		magFilter: LinearFilter,
+		generateMipmaps: true,
+	});
 	renderer.setRenderTarget(renderTexture);
 	renderer.setClearColor(0xff0000, 0)
 	renderer.clear();
