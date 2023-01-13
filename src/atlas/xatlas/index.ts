@@ -1,0 +1,6 @@
+export * from './baseXAtlas'
+// export * from './unwrapperJS'
+export * from './XAtlasWebWorker'
+// export * from './XAtlasJS'
+export * from './UVUnwrapper'
+export * from './unwrapperWorker'

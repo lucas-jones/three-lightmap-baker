@@ -12,6 +12,11 @@
   resolved "https://registry.yarnpkg.com/@tweakpane/core/-/core-1.1.0.tgz#a8290a7fbc1e0b63ba6ba87f53f8f21ed0401b65"
   integrity sha512-vbbiQb+aoFI13lIbE7DJvhHZVE1YlUpGoaAamSpU6wLp2jA3VowS1wfRJBBB8IBCYm7nF6ULl7zfJKxl1XdyfA==
 
+comlink@^4.3.1:
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/comlink/-/comlink-4.3.1.tgz#0c6b9d69bcd293715c907c33fe8fc45aecad13c5"
+  integrity sha512-+YbhUdNrpBZggBAHWcgQMLPLH1KDF3wJpeqrCKieWQ8RL7atmgsgTQko1XEBK6PsecfopWNntopJ+ByYG1lRaA==
+
 esbuild-android-64@0.14.54:
   version "0.14.54"
   resolved "https://registry.yarnpkg.com/esbuild-android-64/-/esbuild-android-64-0.14.54.tgz#505f41832884313bbaffb27704b8bcaa2d8616be"
@@ -139,6 +144,11 @@ esbuild@^0.14.27:
     esbuild-windows-64 "0.14.54"
     esbuild-windows-arm64 "0.14.54"
 
+file-saver@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-2.0.5.tgz#d61cfe2ce059f414d899e9dd6d4107ee25670c38"
+  integrity sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==
+
 fsevents@~2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
@@ -249,3 +259,10 @@ xatlas-three@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/xatlas-three/-/xatlas-three-0.1.1.tgz#5226ef4cdcb45e0117b9590e36710b58a38c4f2c"
   integrity sha512-sl/4EtNTfTsmhWa5ly+5yuUYww/xaulbOMn/ZpfT8uWE0dM1T7Gtlr4rknjzAA23dv9O00tpnvwj1rBUfoNPtQ==
+
+xatlasjs@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/xatlasjs/-/xatlasjs-0.1.0.tgz#cc18988808942bfe119e151c5dbe8786f438b7f4"
+  integrity sha512-Ko6UOqcQtOXCvXO0OjJzWDAuGErHXQ318K3wvVrQ96Qme5tBzxTNqzxruVjB6VPLf/tbigw1HjYAAGnzPAFDZQ==
+  optionalDependencies:
+    comlink "^4.3.1"

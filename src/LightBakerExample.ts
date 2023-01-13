@@ -1,4 +1,4 @@
-import { sRGBEncoding, Color, DirectionalLight, DoubleSide, LinearFilter, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, PerspectiveCamera, PlaneGeometry, Scene, Texture, Vector3, WebGLRenderer, WebGLRenderTarget } from 'three';
+import { TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, sRGBEncoding, Color, DirectionalLight, DoubleSide, LinearFilter, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, PerspectiveCamera, PlaneGeometry, Scene, Texture, Vector3, WebGLRenderer, WebGLRenderTarget, FrontSide } from 'three';
 import { MeshBVH } from 'three-mesh-bvh';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
@@ -8,9 +8,14 @@ import { renderAtlas } from './atlas/renderAtlas';
 import { generateLightmapper as generateLightmapper, Lightmapper, RaycastOptions } from './lightmap/Lightmapper';
 import { mergeGeometry } from './utils/GeometryUtils';
 import { LoadGLTF } from './utils/LoaderUtils';
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
+import { saveAs } from "file-saver";
+import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils';
 
 const models = {
-    ["level_blockout.glb"]: "level_blockout.glb",
+    // ["level_blockout.glb"]: "level_blockout.glb",
+    ["forest.glb"]: "forest-client.glb",
+    ["forest-server.glb"]: "forest-server.glb",
 }
 
 const renderMode = {
@@ -55,7 +60,7 @@ export class LightBakerExample {
     pane: Pane;
 
     options = {
-        model: "level_blockout",
+        model: "forest.glb",
         renderMode: "beauty",
         lightMapSize: 1024,
         casts: 1,
@@ -109,7 +114,7 @@ export class LightBakerExample {
         }).on('change', () => this.onRenderModeChange());
 
         this.pane.addInput(this.options, 'lightMapSize', {
-            max: 4096,
+            max: 4096 * 4,
             min: 128,
             step: 128
         })
@@ -149,6 +154,25 @@ export class LightBakerExample {
         });
 
         this.pane.addInput(this.options, 'pause');
+
+
+        this.pane.addButton({
+            title: 'Export'
+        }).on('click', () => {
+            const exporter = new GLTFExporter();
+        
+            exporter.parse(
+                this.scene,
+                data => {
+                    console.log(data);
+                    // const jsonString = JSON.stringify(data);
+                    // console.log(jsonString);
+                    // const blob = new Blob([jsonString], { type: "application/json" });
+                    // saveAs(blob, "map.glb");
+                },{}
+            );
+
+        });
         
         this.initialSetup();
     }
@@ -176,24 +200,41 @@ export class LightBakerExample {
         
         const gltf = await LoadGLTF(this.options.model);
 
+        gltf.scene.children = [ gltf.scene.children[0].children[0] ];
+
         gltf.scene.traverse((child: any) => {
             if(child.isMesh) {
                 child.material._originalMap = child.material.map;
                 this.currentModelMeshs.push(child);
+                // (child.material as MeshStandardMaterial).color.set(0xffffff);
+                (child.material as MeshStandardMaterial).vertexColors = false;
+                (child.material as MeshStandardMaterial).side = FrontSide;
             }
         });
 
         this.currentModel = gltf.scene;
-        this.scene.add(gltf.scene);
+        
+        // const mesh = gltf.scene.children[0].children[0].children[0] as Mesh;
+        // // console.log(mesh);
+        // // return;
 
+        // mesh.material._originalMap = mesh.material.map;
+        // this.currentModelMeshs.push(mesh);
+
+        // // mesh.material   =new MeshBasicMaterial({ color: 0xffffff, map: this.uvDebugTexture})
+       
+        // this.currentModel = mesh;
+        
         await this.updateAtlasTextures();
+
+        this.scene.add(gltf.scene);
 
         this.update();
 
         await this.generateLightmap();
-
-        // Render once to get the lightmap
-        this.lightmapper.render();
+// // 
+//         // Render once to get the lightmap
+//         this.lightmapper.render();
     }
 
     async updateAtlasTextures() {
@@ -208,9 +249,10 @@ export class LightBakerExample {
         this.normalTexture = atlas.normalTexture;
 
         this.update();
-
-        const mergedGeomerty = mergeGeometry(this.currentModelMeshs);
-        const bvh = new MeshBVH(mergedGeomerty);
+        // return
+        console.log(this.currentModelMeshs);
+        const mergedGeomerty = this.currentModelMeshs[0];
+        const bvh = new MeshBVH(mergedGeomerty.geometry);
      
         const lightmapperOptions: RaycastOptions = {
             resolution: resolution,
