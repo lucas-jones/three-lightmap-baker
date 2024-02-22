@@ -1,6 +1,7 @@
 import { Matrix4, ShaderMaterial, Texture, Vector3 } from "three";
 import { MeshBVH, MeshBVHUniformStruct, shaderIntersectFunction, shaderStructs } from 'three-mesh-bvh';
 
+
 export type LightmapperMaterialOptions = {
     bvh: MeshBVH,
     invModelMatrix: Matrix4,

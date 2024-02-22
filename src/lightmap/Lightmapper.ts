@@ -49,7 +49,7 @@ export const generateLightmapper = (renderer: WebGLRenderer, positions: Texture,
 	renderer.clear();
 
 	const raycastMesh = new Mesh(new PlaneGeometry(2, 2), raycastMaterial);
-	const orthographicCamera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+	const orthographicCamera = new OrthographicCamera();
 
 	let totalSamples = 0;
 	

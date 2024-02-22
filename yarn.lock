@@ -12,6 +12,26 @@
   resolved "https://registry.yarnpkg.com/@tweakpane/core/-/core-1.1.0.tgz#a8290a7fbc1e0b63ba6ba87f53f8f21ed0401b65"
   integrity sha512-vbbiQb+aoFI13lIbE7DJvhHZVE1YlUpGoaAamSpU6wLp2jA3VowS1wfRJBBB8IBCYm7nF6ULl7zfJKxl1XdyfA==
 
+"@types/stats.js@*":
+  version "0.17.3"
+  resolved "https://registry.yarnpkg.com/@types/stats.js/-/stats.js-0.17.3.tgz#705446e12ce0fad618557dd88236f51148b7a935"
+  integrity sha512-pXNfAD3KHOdif9EQXZ9deK82HVNaXP5ZIF5RP2QG6OQFNTaY2YIetfrE9t528vEreGQvEPRDDc8muaoYeK0SxQ==
+
+"@types/three@^0.161.0":
+  version "0.161.2"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.161.2.tgz#3c7e3f40869ad52970f517583cc200472e8918bf"
+  integrity sha512-DazpZ+cIfBzbW/p0zm6G8CS03HBMd748A3R1ZOXHpqaXZLv2I5zNgQUrRG//UfJ6zYFp2cUoCQaOLaz8ubH07w==
+  dependencies:
+    "@types/stats.js" "*"
+    "@types/webxr" "*"
+    fflate "~0.6.10"
+    meshoptimizer "~0.18.1"
+
+"@types/webxr@*":
+  version "0.5.14"
+  resolved "https://registry.yarnpkg.com/@types/webxr/-/webxr-0.5.14.tgz#9a03121a4912ea113b31e5c9c17f164d4fff8a1f"
+  integrity sha512-UEMMm/Xn3DtEa+gpzUrOcDj+SJS1tk5YodjwOxcqStNhCfPcwgyC5Srg2ToVKyg2Fhq16Ffpb0UWUQHqoT9AMA==
+
 esbuild-android-64@0.14.54:
   version "0.14.54"
   resolved "https://registry.yarnpkg.com/esbuild-android-64/-/esbuild-android-64-0.14.54.tgz#505f41832884313bbaffb27704b8bcaa2d8616be"
@@ -139,6 +159,11 @@ esbuild@^0.14.27:
     esbuild-windows-64 "0.14.54"
     esbuild-windows-arm64 "0.14.54"
 
+fflate@~0.6.10:
+  version "0.6.10"
+  resolved "https://registry.yarnpkg.com/fflate/-/fflate-0.6.10.tgz#5f40f9659205936a2d18abf88b2e7781662b6d43"
+  integrity sha512-IQrh3lEPM93wVCEczc9SaAOvkmcoQn/G8Bo1e8ZPlY3X3bnAxWaBdvTdvM1hP62iZp0BXWDy4vTAy4fF0+Dlpg==
+
 fsevents@~2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
@@ -162,6 +187,11 @@ is-core-module@^2.9.0:
   integrity sha512-Erxj2n/LDAZ7H8WNJXd9tw38GYM3dv8rk8Zcs+jJuxYTW7sozH+SS8NtrSjVL1/vpLvWi1hxy96IzjJ3EHTJJg==
   dependencies:
     has "^1.0.3"
+
+meshoptimizer@~0.18.1:
+  version "0.18.1"
+  resolved "https://registry.yarnpkg.com/meshoptimizer/-/meshoptimizer-0.18.1.tgz#cdb90907f30a7b5b1190facd3b7ee6b7087797d8"
+  integrity sha512-ZhoIoL7TNV4s5B6+rx5mC//fw8/POGyNxS/DZyCJeiZ12ScLfVwRE/GfsxwiTkMYYD5DmK2/JXnEVXqL4rF+Sw==
 
 nanoid@^3.3.4:
   version "3.3.4"
@@ -213,15 +243,15 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-three-mesh-bvh@^0.5.16:
-  version "0.5.16"
-  resolved "https://registry.yarnpkg.com/three-mesh-bvh/-/three-mesh-bvh-0.5.16.tgz#ed8518355fb70d7da6a5537558ba43f76a56b067"
-  integrity sha512-kN3QGKJNiQQcuiOsjVIkjtPnV3PJa+0Orih2E52afa+kQfs3zfoYt6Kxn6b6RNiAfaQ+7ckwPK0mTVFVl2F2LA==
+three-mesh-bvh@^0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/three-mesh-bvh/-/three-mesh-bvh-0.7.3.tgz#91f2d7e26f230288b5b0a6bdf41bdd9620348945"
+  integrity sha512-3W6KjzmupjfE89GuHPT31kxKWZ4YGZPEZJNysJpiOZfQRsBQQgmK7v/VJPpjG6syhAvTnY+5Fr77EvIkTLpGSw==
 
-three@^0.129.0:
-  version "0.129.0"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.129.0.tgz#f5e530bbc96eac5d5b4749cb5da886ef0d42f554"
-  integrity sha512-wiWio1yVRg2Oj6WEWsTHQo5eSzYpEwSBtPSi3OofNpvFbf26HFfb9kw4FZJNjII4qxzp0b1xLB11+tKkBGB1ZA==
+three@^0.161.0:
+  version "0.161.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.161.0.tgz#38aafaa82fe5467fde2e33933515d1b6beb17d91"
+  integrity sha512-LC28VFtjbOyEu5b93K0bNRLw1rQlMJ85lilKsYj6dgTu+7i17W+JCCEbvrpmNHF1F3NAUqDSWq50UD7w9H2xQw==
 
 tweakpane@^3.0.2:
   version "3.1.0"
@@ -245,7 +275,7 @@ vite@^2.6.13:
   optionalDependencies:
     fsevents "~2.3.2"
 
-xatlas-three@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/xatlas-three/-/xatlas-three-0.1.1.tgz#5226ef4cdcb45e0117b9590e36710b58a38c4f2c"
-  integrity sha512-sl/4EtNTfTsmhWa5ly+5yuUYww/xaulbOMn/ZpfT8uWE0dM1T7Gtlr4rknjzAA23dv9O00tpnvwj1rBUfoNPtQ==
+xatlas-three@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/xatlas-three/-/xatlas-three-0.2.0.tgz#2ea6aad4a286c33f835d5d8ccbb8f8a6e04e8551"
+  integrity sha512-oZjKK+n4xVi9tj1PTdBycYLkQtoOjXlTYMDfdHwR2JUlvBaIy2faO1lOxAamkKlcEVQbdX981i0jR7vXVTxf4A==

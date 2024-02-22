@@ -1,11 +1,9 @@
-import { DoubleSide, FloatType, Mesh, NearestFilter, Object3D, OrthographicCamera, ShaderMaterial, Uniform, Vector2, WebGLRenderer, WebGLRenderTarget } from 'three';
+import { DoubleSide, FloatType, Mesh, NearestFilter, Object3D, OrthographicCamera, ShaderMaterial, Uniform, Vector2, WebGLRenderer, WebGLRenderTarget, Texture } from 'three';
 
 const worldPositionVertexShader =`
     uniform vec2 offset;
     attribute vec2 uv2;
-    centroid varying vec4 vWorldPosition; 
-    varying vec3 vNormal;
-
+    varying vec4 vWorldPosition;
 
     void main() {
         vWorldPosition = modelMatrix * vec4(position, 1.0) ;
@@ -15,8 +13,7 @@ const worldPositionVertexShader =`
 `;
 
 const worldPositionFragmentShader = `
-    varying vec4 vWorldPosition; 
-    varying vec3 vNormal;
+    varying vec4 vWorldPosition;
 
     void main() {
         gl_FragColor = vWorldPosition;
@@ -41,7 +38,7 @@ const normalVertexShader =`
     uniform vec2 offset;
 
     void main() {
-        vNormal = normalize(modelMatrix * vec4(normal, 0.0));
+        vNormal = modelMatrix * vec4(normal, 0.0);
 
         gl_Position = vec4((uv2 + offset) * 2.0 - 1.0, 0.0, 1.0);
     }
@@ -52,7 +49,7 @@ const normalFragmentShader = `
     varying vec4 vNormal;
 
     void main() {
-        gl_FragColor = normalize(vNormal);//vec4(0.0, 0.0, 1.0, 1.0);
+        gl_FragColor = normalize(vNormal);
     }
 `;
 
@@ -102,16 +99,16 @@ const offsets =
 
 export const renderAtlas = (renderer: WebGLRenderer, meshs: Mesh[], resolution: number, dialate: boolean = true) => {
 
-    const renderWithShader = (material: ShaderMaterial): WebGLRenderTarget => {
+    const renderWithShader = (material: ShaderMaterial): Texture => {
         const target = new WebGLRenderTarget(resolution, resolution, {type: FloatType, magFilter: NearestFilter, minFilter: NearestFilter});
-
         // Create orthographic camera with large clip area to prevent clipping the geometry
         // I'm don't know a better way to do this :(
         const orthographicCamera = new OrthographicCamera(-100, 100, -100, 100, -100, 200);
         orthographicCamera.updateMatrix();
-
+    
         // Re-create objects with util material - Maybe we could just change the material on the fly?
         const lightMapMeshes = new Object3D();
+        lightMapMeshes.matrixWorldAutoUpdate = false;
 
         for (const mesh of meshs) {
             const lightMapMesh = mesh.clone();
@@ -124,7 +121,7 @@ export const renderAtlas = (renderer: WebGLRenderer, meshs: Mesh[], resolution: 
         renderer.setRenderTarget(target);
         renderer.setClearColor(0, 0);
         renderer.clear()
-
+    
         if(dialate) {
             for (const offset of offsets) {
                 material.uniforms.offset.value.x = offset.x * (1 / resolution);
@@ -132,14 +129,14 @@ export const renderAtlas = (renderer: WebGLRenderer, meshs: Mesh[], resolution: 
                 renderer.render(lightMapMeshes, orthographicCamera)
             }
         }
-
+    
         material.uniforms.offset.value.x = 0;
         material.uniforms.offset.value.y = 0;
         renderer.render(lightMapMeshes, orthographicCamera)
-
+    
         renderer.setRenderTarget(null);
         
-        return target;
+        return target.texture;
     }
 
     const positionTexture = renderWithShader(worldPositionMaterial);

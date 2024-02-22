@@ -8,13 +8,14 @@
 	},
 	"dependencies": {
 		"@tweakpane/core": "^1.0.3",
-		"three": "^0.129.0",
-		"three-mesh-bvh": "^0.5.16",
+		"three": "^0.161.0",
+		"three-mesh-bvh": "^0.7.3",
 		"tweakpane": "^3.0.2",
-		"xatlas-three": "^0.1.1"
+		"xatlas-three": "^0.2.0"
 	},
 	"devDependencies": {
 		"typescript": "^4.4.4",
+		"@types/three": "^0.161.0",
 		"vite": "^2.6.13"
 	}
 }

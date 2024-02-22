@@ -1,4 +1,4 @@
-import { sRGBEncoding, Color, DirectionalLight, DoubleSide, LinearFilter, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, PerspectiveCamera, PlaneGeometry, Scene, Texture, Vector3, WebGLRenderer, WebGLRenderTarget } from 'three';
+import { Color, DirectionalLight, DoubleSide, LinearFilter, Mesh, MeshBasicMaterial, MeshStandardMaterial, NearestFilter, Object3D, PerspectiveCamera, PlaneGeometry, Scene, Texture, Vector3, WebGLRenderer, WebGLRenderTarget, SRGBColorSpace } from 'three';
 import { MeshBVH } from 'three-mesh-bvh';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
@@ -42,8 +42,8 @@ export class LightBakerExample {
     currentModelMeshs: Mesh[] = [];
 
     uvDebugTexture: Texture;
-    positionTexture: WebGLRenderTarget;
-    normalTexture: WebGLRenderTarget;
+    positionTexture: Texture;
+    normalTexture: Texture;
     lightmapTexture: WebGLRenderTarget;
 
     debugPosition: Mesh;
@@ -80,7 +80,8 @@ export class LightBakerExample {
         this.renderer = new WebGLRenderer({
             antialias: true,
         });
-        this.renderer.outputEncoding = sRGBEncoding;
+        this.renderer.outputColorSpace = SRGBColorSpace;
+        
         this.renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild(this.renderer.domElement);
 
@@ -224,7 +225,7 @@ export class LightBakerExample {
             indirectLightEnabled: this.options.indirectLightEnabled,   
         }
 
-        this.lightmapper = await generateLightmapper(this.renderer, atlas.positionTexture.texture, atlas.normalTexture.texture, bvh, lightmapperOptions);
+        this.lightmapper = await generateLightmapper(this.renderer, atlas.positionTexture, atlas.normalTexture, bvh, lightmapperOptions);
         this.lightmapTexture = this.lightmapper.renderTexture;
 
         this.onRenderModeChange();
@@ -267,9 +268,9 @@ export class LightBakerExample {
         }
 
         if(this.options.debugTextures) {
-            this.debugPosition = this.createDebugTexture(this.positionTexture.texture, new Vector3(0, 10, 0));
-            this.debugNormals = this.createDebugTexture(this.normalTexture.texture, new Vector3(12, 10, 0));
-            this.debugLightmap = this.createDebugTexture(this.lightmapTexture, new Vector3(24, 10, 0));
+            this.debugPosition = this.createDebugTexture(this.positionTexture, new Vector3(0, 10, 0));
+            this.debugNormals = this.createDebugTexture(this.normalTexture, new Vector3(12, 10, 0));
+            this.debugLightmap = this.createDebugTexture(this.lightmapTexture.texture, new Vector3(24, 10, 0));
         }
     }
 
@@ -287,27 +288,33 @@ export class LightBakerExample {
 
                 if(this.options.renderMode == "positions") {
                     child.material.lightMap = this.positionTexture;
+                    child.material.lightMap.channel = 2;
                 }
 
                 if(this.options.renderMode == "normals") {
                     child.material.lightMap = this.normalTexture; 
+                    child.material.lightMap.channel = 2;
                 }
 
                 if(this.options.renderMode == "uv") {
-                    child.material.lightMap = this.uvDebugTexture; 
+                    child.material.lightMap = this.uvDebugTexture;
+                    child.material.lightMap.channel = 2;
                 }
 
                 if(this.options.renderMode == "lightmap") {
-                    child.material.lightMap = this.lightmapTexture; 
+                    child.material.lightMap = this.lightmapTexture.texture; 
+                    child.material.lightMap.channel = 2;
                 }
 
                 if(this.options.renderMode == "beauty") {
-                    child.material.lightMap = this.lightmapTexture; 
+                    child.material.lightMap = this.lightmapTexture.texture; 
+                    child.material.lightMap.channel = 2;
                     child.material.map = child.material._originalMap;
                 }
 
                 if(child.material.lightMap) {
                     child.material.lightMap.needsUpdate = true;
+                    child.material.lightMap.channel = 2;
                 }
 
 
